@@ -80,13 +80,16 @@ public class ParserAvito {
                         Constans.dollar,
                         FlatAvito.calculateAverage(flatAvitoList, "pricePerMetr",0),
                         FlatAvito.calculateMedian(flatAvitoList, "pricePerMetr",0),
+                        FlatAvito.calculateAverage(flatAvitoList, "price",0),
+                        FlatAvito.calculateMedian(flatAvitoList, "price",0),
                         FlatAvito.calculateAverage(flatAvitoList, "price",1),
                         FlatAvito.calculateMedian(flatAvitoList, "price",1),
                         FlatAvito.calculateAverage(flatAvitoList, "price",2),
                         FlatAvito.calculateMedian(flatAvitoList, "price",2),
                         FlatAvito.calculateAverage(flatAvitoList, "price",3),
                         FlatAvito.calculateMedian(flatAvitoList, "price",3),
-                        city
+                        city,
+                        System.currentTimeMillis()
                 ));
                 PostgreConnection.getFlatAvitoConnection().commit();
             }catch (Exception e) {
