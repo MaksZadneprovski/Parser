@@ -2,6 +2,7 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class PostgreConnection {
@@ -24,5 +25,25 @@ public class PostgreConnection {
             }
         }
         return flatConnection;
+    }
+
+    public static PreparedStatement getPreparedStatement(String sql){
+        PreparedStatement preparedStatement = null;
+        try{
+            PostgreConnection.getFlatAvitoConnection().prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return preparedStatement;
+    }
+
+    public static void closePrepareStatement(PreparedStatement ps) {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

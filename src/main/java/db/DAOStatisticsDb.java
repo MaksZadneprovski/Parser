@@ -40,39 +40,29 @@ public class DAOStatisticsDb {
             e.printStackTrace();
         }
     }
-    public void insertStatisticsFlatAvito(StatisticsFlatAvito statisticsFlatAvito){
-        insertRow(
-                statisticsFlatAvito.getDollar(),
-                statisticsFlatAvito.getAveragePriceMeter(),
-                statisticsFlatAvito.getMedianPriceMeter(),
-                statisticsFlatAvito.getAveragePriceMeter1(),
-                statisticsFlatAvito.getMedianPriceMeter1(),
-                statisticsFlatAvito.getAveragePriceMeter2(),
-                statisticsFlatAvito.getMedianPriceMeter2(),
-                statisticsFlatAvito.getAveragePriceMeter3(),
-                statisticsFlatAvito.getMedianPriceMeter3(),
-                statisticsFlatAvito.getCity(),
-                new Date(statisticsFlatAvito.getDate())
-        );
-    }
-    private void insertRow(int d, long pm, long mp, long pm1, long mp1, long pm2, long mp2, long pm3, long mp3, String c, Date date ){
+
+
+    public void insert(StatisticsFlatAvito sFA){
+        PreparedStatement ps =  PostgreConnection.getPreparedStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter, averagepricemeter1, medianpricemeter1, averagepricemeter2, medianpricemeter2, averagepricemeter3, medianpricemeter3, city, date) values(?,?,?,?,?,?,?,?,?,?,?)");
         try {
-            PreparedStatement preparedStatement = PostgreConnection.getFlatAvitoConnection().prepareStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter, averagepricemeter1, medianpricemeter1, averagepricemeter2, medianpricemeter2, averagepricemeter3, medianpricemeter3, city, date) values(?,?,?,?,?,?,?,?,?,?,?)");
-            preparedStatement.setLong(1,d);
-            preparedStatement.setLong(2,pm);
-            preparedStatement.setLong(3,mp);
-            preparedStatement.setLong(4,pm1);
-            preparedStatement.setLong(5,mp1);
-            preparedStatement.setLong(6,pm2);
-            preparedStatement.setLong(7,mp2);
-            preparedStatement.setLong(8,pm3);
-            preparedStatement.setLong(9,mp3);
-            preparedStatement.setString(10,c);
-            preparedStatement.setDate(11,date);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
+            ps.setLong(1,sFA.getDollar());
+            ps.setLong(2,sFA.getAveragePriceMeter());
+            ps.setLong(3,sFA.getMedianPriceMeter());
+            ps.setLong(4,sFA.getAveragePriceMeter1());
+            ps.setLong(5,sFA.getMedianPriceMeter1());
+            ps.setLong(6,sFA.getAveragePriceMeter2());
+            ps.setLong(7,sFA.getMedianPriceMeter2());
+            ps.setLong(8,sFA.getAveragePriceMeter3());
+            ps.setLong(9,sFA.getMedianPriceMeter3());
+            ps.setString(10, sFA.getCity());
+            ps.setDate(11,new Date(sFA.getDate()));
+            ps.executeUpdate();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        finally {
+            PostgreConnection.closePrepareStatement(ps);
         }
     }
 }

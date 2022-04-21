@@ -77,34 +77,16 @@ public class ParserAvito {
             try {
                 DAOStatisticsDb daoStatisticsDb = new DAOStatisticsDb();
                 PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
-                daoStatisticsDb.insertStatisticsFlatAvito(new StatisticsFlatAvito(
+                daoStatisticsDb.insert(new StatisticsFlatAvito(
                         Dollar.dollar,
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "pricePerMetr"),
-                        FlatAvito.calculateMedian(flatAvitoList ,Comparator.comparing(e->e.getPrice()), "pricePerMetr"),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList.stream()
-                                        .filter(f->f.getFloors() == 1)
-                                        .collect(Collectors.toList()),
-                                "price"),
-                        FlatAvito.calculateMedian(flatAvitoList.stream()
-                                        .filter(f->f.getFloors() == 1)
-                                        .collect(Collectors.toList()),
-                                Comparator.comparing(e->e.getPrice()), "price"),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList.stream()
-                                        .filter(f->f.getFloors() == 2)
-                                        .collect(Collectors.toList()),
-                                "price"),
-                        FlatAvito.calculateMedian(flatAvitoList.stream()
-                                        .filter(f->f.getFloors() == 2)
-                                        .collect(Collectors.toList()),
-                                Comparator.comparing(e->e.getPrice()), "price"),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList.stream().
-                                        filter(f->f.getFloors() == 3)
-                                        .collect(Collectors.toList()),
-                                "price"),
-                        FlatAvito.calculateMedian(flatAvitoList.stream()
-                                        .filter(f->f.getFloors() == 3)
-                                        .collect(Collectors.toList()),
-                                Comparator.comparing(e->e.getPrice()), "price"),
+                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "pricePerMetr",0),
+                        FlatAvito.calculateMedian(flatAvitoList, "pricePerMetr",0),
+                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",1),
+                        FlatAvito.calculateMedian(flatAvitoList, "price",1),
+                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",2),
+                        FlatAvito.calculateMedian(flatAvitoList, "price",2),
+                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",3),
+                        FlatAvito.calculateMedian(flatAvitoList, "price",3),
                         city
                 ));
                 PostgreConnection.getFlatAvitoConnection().commit();

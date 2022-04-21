@@ -65,9 +65,12 @@ public class FlatAvito {
         flatAvitoList.stream().distinct().sorted(Comparator.comparing(f->f.getPricePerMeter())).limit(count).forEach(System.out::println);
     }
 
-    public static long calculateAveragePricePerMeter(List<FlatAvito> flatAvitoList, String s){
+    public static long calculateAveragePricePerMeter(List<FlatAvito> flatAvitoList, String s , int numberOfRooms){
         double d = 0;
         int i = 0;
+        if (numberOfRooms > 0){
+            flatAvitoList = getFilterNumberOfRoomsList(flatAvitoList, numberOfRooms);
+        }
         for (FlatAvito f :flatAvitoList) {
             if (s.equals("price")){
                 d+=f.getPrice();
@@ -80,20 +83,31 @@ public class FlatAvito {
         return Math.round(d/i);
     }
 
-    public static long calculateMedian(List<FlatAvito> flatAvitoList, Comparator<?super FlatAvito> comparator,String s){
-        List<FlatAvito> fA = flatAvitoList.stream().sorted(comparator).collect(Collectors.toList());
+    private static List<FlatAvito> getFilterNumberOfRoomsList(List<FlatAvito> flatAvitoList, int numberOfRooms){
+        return flatAvitoList.stream()
+                .filter(f->f.getNumberOfRooms() == numberOfRooms)
+                .collect(Collectors.toList());
+    }
+
+    public static long calculateMedian(List<FlatAvito> flatAvitoList,String s, int numberOfRooms){
+        if (numberOfRooms > 0){
+            flatAvitoList = getFilterNumberOfRoomsList(flatAvitoList, numberOfRooms);
+        }
         List<Long> integers = new ArrayList<>();
         if (s.equals("price")){
-            fA.forEach(e-> integers.add(e.getPrice()));
+            flatAvitoList = flatAvitoList.stream().sorted(Comparator.comparing(e->e.getPrice())).collect(Collectors.toList());
+            flatAvitoList.forEach(e-> integers.add(e.getPrice()));
         }
         if (s.equals("pricePerMetr")){
-            fA.forEach(e-> integers.add((long) e.getPricePerMeter()));
+            flatAvitoList = flatAvitoList.stream().sorted(Comparator.comparing(e->e.getPricePerMeter())).collect(Collectors.toList());
+            flatAvitoList.forEach(e-> integers.add((long) e.getPricePerMeter()));
         }
         Long median;
         if (integers.size() % 2 == 1) median = integers.get((integers.size() + 1)/2);
         else median = (integers.get(integers.size()/2) + integers.get(integers.size()/2 +1)) / 2;
         return Math.round(median);
     }
+
     public void parseTitleString(String s){
         s = s.replaceAll("\\s","");
         Pattern pattern1 = Pattern.compile("\\d+-");
