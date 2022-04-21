@@ -4,7 +4,7 @@ import model.StatisticsFlatAvito;
 
 import java.sql.*;
 
-public class DAOStatisticsDb {
+public class StatisticsDAO {
 
     public  void printAllRows() throws SQLException {
         try {
@@ -35,7 +35,9 @@ public class DAOStatisticsDb {
 
     public static void main(String[] args) {
         try {
-            new DAOStatisticsDb().printAllRows();
+            StatisticsDAO statisticsDAO = new StatisticsDAO();
+//            statisticsDAO.deleteAllData();
+            statisticsDAO.printAllRows();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,26 +45,35 @@ public class DAOStatisticsDb {
 
 
     public void insert(StatisticsFlatAvito sFA){
-        PreparedStatement ps =  PostgreConnection.getPreparedStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter, averagepricemeter1, medianpricemeter1, averagepricemeter2, medianpricemeter2, averagepricemeter3, medianpricemeter3, city, date) values(?,?,?,?,?,?,?,?,?,?,?)");
+        PreparedStatement ps = null;
         try {
+            ps =  PostgreConnection.getPreparedStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter, averageprice1, medianprice1, averageprice2, medianprice2, averageprice3, medianprice3, city, date) values(?,?,?,?,?,?,?,?,?,?,?)");
             ps.setLong(1,sFA.getDollar());
             ps.setLong(2,sFA.getAveragePriceMeter());
             ps.setLong(3,sFA.getMedianPriceMeter());
-            ps.setLong(4,sFA.getAveragePriceMeter1());
-            ps.setLong(5,sFA.getMedianPriceMeter1());
-            ps.setLong(6,sFA.getAveragePriceMeter2());
-            ps.setLong(7,sFA.getMedianPriceMeter2());
-            ps.setLong(8,sFA.getAveragePriceMeter3());
-            ps.setLong(9,sFA.getMedianPriceMeter3());
+            ps.setLong(4,sFA.getAveragePrice1());
+            ps.setLong(5,sFA.getMedianPrice1());
+            ps.setLong(6,sFA.getAveragePrice2());
+            ps.setLong(7,sFA.getMedianPrice2());
+            ps.setLong(8,sFA.getAveragePrice3());
+            ps.setLong(9,sFA.getMedianPrice3());
             ps.setString(10, sFA.getCity());
             ps.setDate(11,new Date(sFA.getDate()));
             ps.executeUpdate();
-            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         finally {
             PostgreConnection.closePrepareStatement(ps);
+        }
+    }
+
+    public void deleteAllData(){
+        try {
+            Statement st = PostgreConnection.getFlatAvitoConnection().createStatement();
+            st.executeUpdate("TRUNCATE TABLE statistics;");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

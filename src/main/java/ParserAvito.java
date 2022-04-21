@@ -1,7 +1,7 @@
-import db.DAOFlatDb;
-import db.DAOStatisticsDb;
+import db.FlatDAO;
+import db.StatisticsDAO;
 import db.PostgreConnection;
-import model.Dollar;
+import model.Constans;
 import model.FlatAvito;
 import model.StatisticsFlatAvito;
 import org.jsoup.Jsoup;
@@ -14,9 +14,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ParserAvito {
 
@@ -31,7 +29,8 @@ public class ParserAvito {
             int n = 0;
             int prevNumberPage = 0;
             int numberPage = 0;
-            for (int i = 0; n < 5; i++) {
+            //for (int i = 0; n < 5; i++) {
+            for (int i = 0; i < 2; i++) {
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
                 elements.forEach(e-> {
@@ -64,10 +63,10 @@ public class ParserAvito {
                     }
                 }
 
-                DAOFlatDb flatDb = new DAOFlatDb();
+                FlatDAO flatDb = new FlatDAO();
                 try {
                     PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
-                    flatAvitoList.forEach(e-> flatDb.insertFlatAvito(e));
+                    flatAvitoList.forEach(flatDb::insert);
                     PostgreConnection.getFlatAvitoConnection().commit();
                 } catch (Exception e) {
                     PostgreConnection.getFlatAvitoConnection().rollback();
@@ -75,17 +74,17 @@ public class ParserAvito {
                 }
             }
             try {
-                DAOStatisticsDb daoStatisticsDb = new DAOStatisticsDb();
+                StatisticsDAO statisticsDAO = new StatisticsDAO();
                 PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
-                daoStatisticsDb.insert(new StatisticsFlatAvito(
-                        Dollar.dollar,
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "pricePerMetr",0),
+                statisticsDAO.insert(new StatisticsFlatAvito(
+                        Constans.dollar,
+                        FlatAvito.calculateAverage(flatAvitoList, "pricePerMetr",0),
                         FlatAvito.calculateMedian(flatAvitoList, "pricePerMetr",0),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",1),
+                        FlatAvito.calculateAverage(flatAvitoList, "price",1),
                         FlatAvito.calculateMedian(flatAvitoList, "price",1),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",2),
+                        FlatAvito.calculateAverage(flatAvitoList, "price",2),
                         FlatAvito.calculateMedian(flatAvitoList, "price",2),
-                        FlatAvito.calculateAveragePricePerMeter(flatAvitoList, "price",3),
+                        FlatAvito.calculateAverage(flatAvitoList, "price",3),
                         FlatAvito.calculateMedian(flatAvitoList, "price",3),
                         city
                 ));

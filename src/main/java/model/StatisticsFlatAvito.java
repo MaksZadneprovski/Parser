@@ -9,31 +9,28 @@ public class StatisticsFlatAvito {
     private int dollar;
     private long averagePriceMeter;
     private long medianPriceMeter;
-    private long averagePriceMeter1;
-    private long medianPriceMeter1;
-    private long averagePriceMeter2;
-    private long medianPriceMeter2;
-    private long averagePriceMeter3;
-    private long medianPriceMeter3;
+    private long averagePrice1;
+    private long medianPrice1;
+    private long averagePrice2;
+    private long medianPrice2;
+    private long averagePrice3;
+    private long medianPrice3;
     private String city;
     private long date;
 
-    public StatisticsFlatAvito(int dollar, long averagePriceMeter, long medianPriceMeter, long averagePriceMeter1, long medianPriceMeter1, long averagePriceMeter2, long medianPriceMeter2, long averagePriceMeter3, long medianPriceMeter3, String city) {
+    public StatisticsFlatAvito(int dollar, long averagePriceMeter, long medianPriceMeter, long averagePrice1, long medianPrice1, long averagePrice2, long medianPrice2, long averagePrice3, long medianPrice3, String city) {
         this.dollar = dollar;
         this.averagePriceMeter = averagePriceMeter;
         this.medianPriceMeter = medianPriceMeter;
-        this.averagePriceMeter1 = averagePriceMeter1;
-        this.medianPriceMeter1 = medianPriceMeter1;
-        this.averagePriceMeter2 = averagePriceMeter2;
-        this.medianPriceMeter2 = medianPriceMeter2;
-        this.averagePriceMeter3 = averagePriceMeter3;
-        this.medianPriceMeter3 = medianPriceMeter3;
+        this.averagePrice1 = averagePrice1;
+        this.medianPrice1 = medianPrice1;
+        this.averagePrice2 = averagePrice2;
+        this.medianPrice2 = medianPrice2;
+        this.averagePrice3 = averagePrice3;
+        this.medianPrice3 = medianPrice3;
         this.city = city;
         this.date = System.currentTimeMillis();
     }
-
-
-
 }
 
 

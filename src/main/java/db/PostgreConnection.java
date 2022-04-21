@@ -7,8 +7,8 @@ import java.sql.SQLException;
 
 public class PostgreConnection {
 
-    public static Connection flatConnection;
-    public static Connection statisticsConnection;
+    private static Connection flatConnection;
+    private static Connection statisticsConnection;
 
     public static Connection getFlatAvitoConnection(){
         if (flatConnection == null){
@@ -30,7 +30,7 @@ public class PostgreConnection {
     public static PreparedStatement getPreparedStatement(String sql){
         PreparedStatement preparedStatement = null;
         try{
-            PostgreConnection.getFlatAvitoConnection().prepareStatement(sql);
+           preparedStatement = getFlatAvitoConnection().prepareStatement(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }

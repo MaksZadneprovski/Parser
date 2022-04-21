@@ -33,7 +33,7 @@ public class FlatAvito {
         this.href = "https://www.avito.ru/"+href;
         parseMoneyString(moneyString);
         parseTitleString(titleString);
-        this.dollar = Dollar.dollar;
+        this.dollar = Constans.dollar;
         this.priceDollar = (int) (this.price/this.dollar);
         calculateEmptyFields();
         this.city = city;
@@ -65,7 +65,7 @@ public class FlatAvito {
         flatAvitoList.stream().distinct().sorted(Comparator.comparing(f->f.getPricePerMeter())).limit(count).forEach(System.out::println);
     }
 
-    public static long calculateAveragePricePerMeter(List<FlatAvito> flatAvitoList, String s , int numberOfRooms){
+    public static long calculateAverage(List<FlatAvito> flatAvitoList, String s , int numberOfRooms){
         double d = 0;
         int i = 0;
         if (numberOfRooms > 0){
