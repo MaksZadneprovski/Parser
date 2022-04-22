@@ -1,10 +1,7 @@
 package model;
 
 import lombok.Data;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.RegularTimePeriod;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -56,8 +53,9 @@ public class StatisticsFlatAvito {
             List<StatisticsFlatAvito> sFAlist  = list.stream().filter(sFA -> sFA.getCity().equals(s)).collect(Collectors.toList());
             TimeSeries series = new TimeSeries(s);
             for (StatisticsFlatAvito f : sFAlist) {
-                Day day = new Day(new Date(f.getDate()));
-                series.addOrUpdate(day, f.getAveragePrice1());
+                Hour hour = new Hour(new Date(f.getDate()));
+
+                series.addOrUpdate(hour, f.getAveragePrice1());
             }
             dataset.addSeries(series);
         }

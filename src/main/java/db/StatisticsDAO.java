@@ -113,7 +113,6 @@ public class StatisticsDAO {
         catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println(sFAList);
         return sFAList;
     }
 
