@@ -1,3 +1,5 @@
+package parser;
+
 import db.FlatDAO;
 import db.StatisticsDAO;
 import db.PostgreConnection;
@@ -15,22 +17,26 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParserAvito {
 
-    public static void main(String[] args) throws SQLException {
+    public static void parse() throws SQLException {
         System.setProperty("webdriver.chrome.driver","selenium\\chromedriver.exe");
+        FlatDAO flatDb = new FlatDAO();
+        StatisticsDAO statisticsDAO = new StatisticsDAO();
 
         for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
             WebDriver driver = new ChromeDriver();
             String city = (String) FlatAvito.link.keySet().toArray()[i0];
             driver.get(FlatAvito.link.get(city));
-            List<FlatAvito> flatAvitoList = new ArrayList<>();
+            List<FlatAvito> fullFlatAvitoList = new ArrayList<>();
             int n = 0;
             int prevNumberPage = 0;
             int numberPage = 0;
-            //for (int i = 0; n < 5; i++) {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; n < 10; i++) {
+//            for (int i = 0; i < 2; i++) {
+                List<FlatAvito> flatAvitoList = new ArrayList<>();
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
                 elements.forEach(e-> {
@@ -58,15 +64,21 @@ public class ParserAvito {
                         WebElement webElement = driver.findElement(By.xpath("//*[@id=\"app\"]/div[3]/div[3]/div[3]/div[6]/div[1]/span[9]"));
                         webElement.click();
                     }catch (Exception ex) {
-                        driver.quit();
-                        ex.printStackTrace();
+                        System.out.println("continue");
+                        continue;
                     }
                 }
 
-                FlatDAO flatDb = new FlatDAO();
                 try {
                     PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
-                    flatAvitoList.forEach(flatDb::insert);
+
+                    List<FlatAvito> finalFlatAvitoList = new ArrayList<>();
+                    finalFlatAvitoList.addAll(flatAvitoList);
+                    finalFlatAvitoList = finalFlatAvitoList.stream().distinct().collect(Collectors.toList());
+                    fullFlatAvitoList.addAll(flatAvitoList);
+                    finalFlatAvitoList.forEach(flatDb::insert);
+                    flatAvitoList.clear();
+                    finalFlatAvitoList.clear();
                     PostgreConnection.getFlatAvitoConnection().commit();
                 } catch (Exception e) {
                     PostgreConnection.getFlatAvitoConnection().rollback();
@@ -74,20 +86,20 @@ public class ParserAvito {
                 }
             }
             try {
-                StatisticsDAO statisticsDAO = new StatisticsDAO();
+                fullFlatAvitoList = fullFlatAvitoList.stream().distinct().collect(Collectors.toList());
                 PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
                 statisticsDAO.insert(new StatisticsFlatAvito(
                         Constans.dollar,
-                        FlatAvito.calculateAverage(flatAvitoList, "pricePerMetr",0),
-                        FlatAvito.calculateMedian(flatAvitoList, "pricePerMetr",0),
-                        FlatAvito.calculateAverage(flatAvitoList, "price",0),
-                        FlatAvito.calculateMedian(flatAvitoList, "price",0),
-                        FlatAvito.calculateAverage(flatAvitoList, "price",1),
-                        FlatAvito.calculateMedian(flatAvitoList, "price",1),
-                        FlatAvito.calculateAverage(flatAvitoList, "price",2),
-                        FlatAvito.calculateMedian(flatAvitoList, "price",2),
-                        FlatAvito.calculateAverage(flatAvitoList, "price",3),
-                        FlatAvito.calculateMedian(flatAvitoList, "price",3),
+                        FlatAvito.calculateAverage(fullFlatAvitoList, "pricePerMetr",0),
+                        FlatAvito.calculateMedian(fullFlatAvitoList, "pricePerMetr",0),
+                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",0),
+                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",0),
+                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",1),
+                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",1),
+                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",2),
+                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",2),
+                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",3),
+                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",3),
                         city,
                         System.currentTimeMillis()
                 ));

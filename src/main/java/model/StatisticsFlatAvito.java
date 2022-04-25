@@ -55,7 +55,7 @@ public class StatisticsFlatAvito {
             for (StatisticsFlatAvito f : sFAlist) {
                 Hour hour = new Hour(new Date(f.getDate()));
 
-                series.addOrUpdate(hour, f.getAveragePrice1());
+                series.addOrUpdate(hour, f.getAveragePrice());
             }
             dataset.addSeries(series);
         }
