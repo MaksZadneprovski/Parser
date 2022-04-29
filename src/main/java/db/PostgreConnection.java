@@ -13,9 +13,9 @@ public class PostgreConnection {
         if (DbConnection == null){
             try {
                 Class.forName("org.postgresql.Driver");
-                String url = "jdbc:postgresql://localhost:5432/flat_avito";
-                String login = "postgres";
-                String password = "3007";
+                String url = "jdbc:postgresql://46.173.219.119:5432/flatdb";
+                String login = "root";
+                String password = "root";
                 DbConnection = DriverManager.getConnection(url, login, password);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();

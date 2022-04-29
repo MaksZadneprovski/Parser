@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
 public class ParserAvito {
 
     public static void parse() throws SQLException {
-        System.setProperty("webdriver.chrome.driver","selenium\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver","selenium/chromedriver");
+        //System.setProperty("webdriver.chrome.driver","selenium/chromedriver.exe");
         FlatDAO flatDb = new FlatDAO();
         StatisticsDAO statisticsDAO = new StatisticsDAO();
 
@@ -65,6 +66,7 @@ public class ParserAvito {
                         webElement.click();
                     }catch (Exception ex) {
                         System.out.println("continue");
+                        n++;
                         continue;
                     }
                 }
