@@ -1,7 +1,8 @@
 package parser;
 
 import db.FlatDAO;
-import db.StatisticsDAO;
+import db.LiksDAO;
+import db.StatisticsFlatAvitoDAO;
 import db.PostgreConnection;
 import model.Constans;
 import model.FlatAvito;
@@ -21,11 +22,12 @@ import java.util.stream.Collectors;
 
 public class ParserAvito {
 
-    public static void parse() throws SQLException {
-        System.setProperty("webdriver.chrome.driver","selenium/chromedriver");
-        //System.setProperty("webdriver.chrome.driver","selenium/chromedriver.exe");
-        FlatDAO flatDb = new FlatDAO();
-        StatisticsDAO statisticsDAO = new StatisticsDAO();
+    public static void parse() throws SQLException, InterruptedException {
+//        System.setProperty("webdriver.chrome.driver","selenium/chromedriver");
+        System.setProperty("webdriver.chrome.driver","selenium/chromedriver.exe");
+
+        StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
+        LiksDAO liksDAO = new LiksDAO();
 
         for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
             WebDriver driver = new ChromeDriver();
@@ -36,8 +38,11 @@ public class ParserAvito {
             int prevNumberPage = 0;
             int numberPage = 0;
             for (int i = 0; n < 10; i++) {
-//            for (int i = 0; i < 2; i++) {
+//            for (int i = 0; i < 12; i++) {
                 List<FlatAvito> flatAvitoList = new ArrayList<>();
+                // Чтобы не терялось соединение с БД
+                LiksDAO.getLinks();
+
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
                 elements.forEach(e-> {
@@ -70,47 +75,42 @@ public class ParserAvito {
                         continue;
                     }
                 }
-
+                fullFlatAvitoList.addAll(flatAvitoList);
+                Thread.sleep(5000);
+            }
+            if (numberPage>10) {
                 try {
+                    FlatDAO flatDb = new FlatDAO();
+                    fullFlatAvitoList = fullFlatAvitoList.stream().distinct().collect(Collectors.toList());
                     PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
+                    for (FlatAvito flatAvito : fullFlatAvitoList) {
+                        flatDb.insert(flatAvito);
+                    }
 
-                    List<FlatAvito> finalFlatAvitoList = new ArrayList<>();
-                    finalFlatAvitoList.addAll(flatAvitoList);
-                    finalFlatAvitoList = finalFlatAvitoList.stream().distinct().collect(Collectors.toList());
-                    fullFlatAvitoList.addAll(flatAvitoList);
-                    finalFlatAvitoList.forEach(flatDb::insert);
-                    flatAvitoList.clear();
-                    finalFlatAvitoList.clear();
+                    statisticsFlatAvitoDAO.insert(new StatisticsFlatAvito(
+                            Constans.dollar,
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "pricePerMetr",0),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "pricePerMetr",0),
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "price",0),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "price",0),
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "price",1),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "price",1),
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "price",2),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "price",2),
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "price",3),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "price",3),
+                            city,
+                            System.currentTimeMillis(),
+                            fullFlatAvitoList.size()
+                    ));
                     PostgreConnection.getFlatAvitoConnection().commit();
-                } catch (Exception e) {
+                }catch (Exception e) {
                     PostgreConnection.getFlatAvitoConnection().rollback();
                     e.printStackTrace();
                 }
             }
-            try {
-                fullFlatAvitoList = fullFlatAvitoList.stream().distinct().collect(Collectors.toList());
-                PostgreConnection.getFlatAvitoConnection().setAutoCommit(false);
-                statisticsDAO.insert(new StatisticsFlatAvito(
-                        Constans.dollar,
-                        FlatAvito.calculateAverage(fullFlatAvitoList, "pricePerMetr",0),
-                        FlatAvito.calculateMedian(fullFlatAvitoList, "pricePerMetr",0),
-                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",0),
-                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",0),
-                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",1),
-                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",1),
-                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",2),
-                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",2),
-                        FlatAvito.calculateAverage(fullFlatAvitoList, "price",3),
-                        FlatAvito.calculateMedian(fullFlatAvitoList, "price",3),
-                        city,
-                        System.currentTimeMillis()
-                ));
-                PostgreConnection.getFlatAvitoConnection().commit();
-            }catch (Exception e) {
-                PostgreConnection.getFlatAvitoConnection().rollback();
-                e.printStackTrace();
-            }
             driver.quit();
         }
+        PostgreConnection.getFlatAvitoConnection().close();
     }
 }

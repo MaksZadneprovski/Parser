@@ -1,19 +1,14 @@
 package db;
 
 import model.StatisticsFlatAvito;
-import org.jfree.data.xy.XYDataset;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-public class StatisticsDAO {
+public class StatisticsFlatAvitoDAO {
 
     public  void printAllRows() throws SQLException {
 
@@ -43,20 +38,21 @@ public class StatisticsDAO {
 
     public static void main(String[] args) {
         try {
-            StatisticsDAO statisticsDAO = new StatisticsDAO();
-//            statisticsDAO.deleteAllData();
-            statisticsDAO.printAllRows();
-
+            StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
+            statisticsFlatAvitoDAO.deleteAllData();
+            statisticsFlatAvitoDAO.printAllRows();
+            Statement statement = PostgreConnection.getFlatAvitoConnection().createStatement();
+//            statement.execute("INSERT INTO statistics (dollar, averagepricemeter) values(50,44)");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    public void insert(StatisticsFlatAvito sFA){
+    public  void insert(StatisticsFlatAvito sFA){
         PreparedStatement ps = null;
         try {
-            ps =  PostgreConnection.getPreparedStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter,averageprice, medianprice, averageprice1, medianprice1, averageprice2, medianprice2, averageprice3, medianprice3, city, date) values(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            ps =  PostgreConnection.getPreparedStatement("INSERT INTO statistics (dollar, averagepricemeter, medianpricemeter,averageprice, medianprice, averageprice1, medianprice1, averageprice2, medianprice2, averageprice3, medianprice3, city, date, countflats) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             ps.setLong(1,sFA.getDollar());
             ps.setLong(2,sFA.getAveragePriceMeter());
             ps.setLong(3,sFA.getMedianPriceMeter());
@@ -70,6 +66,7 @@ public class StatisticsDAO {
             ps.setLong(11,sFA.getMedianPrice3());
             ps.setString(12, sFA.getCity());
             ps.setObject(13, new Date(sFA.getDate()).toInstant().atOffset(ZoneOffset.of("+8")).toLocalDateTime());
+            ps.setLong(14,sFA.getCountFlats());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,7 +104,8 @@ public class StatisticsDAO {
                         resultSet.getLong(11),
                         resultSet.getLong(12),
                         resultSet.getString(13),
-                        resultSet.getDate(14).getTime()
+                        resultSet.getDate(14).getTime(),
+                        resultSet.getLong(15)
                 ));
             }
         }

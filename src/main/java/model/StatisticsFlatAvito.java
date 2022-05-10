@@ -28,8 +28,9 @@ public class StatisticsFlatAvito {
     private long medianPrice3;
     private String city;
     private long date;
+    private long countFlats;
 
-    public StatisticsFlatAvito(int dollar, long averagePriceMeter, long medianPriceMeter,long averagePrice, long medianPrice, long averagePrice1, long medianPrice1, long averagePrice2, long medianPrice2, long averagePrice3, long medianPrice3, String city, long date) {
+    public StatisticsFlatAvito(int dollar, long averagePriceMeter, long medianPriceMeter,long averagePrice, long medianPrice, long averagePrice1, long medianPrice1, long averagePrice2, long medianPrice2, long averagePrice3, long medianPrice3, String city, long date,long countFlats) {
         this.dollar = dollar;
         this.averagePriceMeter = averagePriceMeter;
         this.medianPriceMeter = medianPriceMeter;
@@ -43,6 +44,7 @@ public class StatisticsFlatAvito {
         this.medianPrice3 = medianPrice3;
         this.city = city;
         this.date = date;
+        this.countFlats = countFlats;
     }
 
     public static XYDataset createTimeSeriesCollection(List<StatisticsFlatAvito> list) {

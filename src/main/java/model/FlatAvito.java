@@ -1,7 +1,9 @@
 package model;
 
+import db.LiksDAO;
 import lombok.Data;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,12 +11,16 @@ import java.util.stream.Collectors;
 
 @Data
 public class FlatAvito {
-    public   static Map<String, String> link = new HashMap<>();
+    public   static Map<String, String> link;
+
     static {
-        link.put("Волжский","https://www.avito.ru/volgogradskaya_oblast_volzhskiy/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1");
-        link.put("Волгоград","https://www.avito.ru/volgograd/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1");
-        link.put("Москва","https://www.avito.ru/moskva/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1");
+        try {
+            link = LiksDAO.getLinks();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
     private long price;
     private int priceDollar;
     private int dollar;
