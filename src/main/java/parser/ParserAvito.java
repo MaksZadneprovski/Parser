@@ -27,7 +27,6 @@ public class ParserAvito {
         System.setProperty("webdriver.chrome.driver","selenium/chromedriver.exe");
 
         StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
-        LiksDAO liksDAO = new LiksDAO();
 
         for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
             WebDriver driver = new ChromeDriver();
@@ -41,7 +40,8 @@ public class ParserAvito {
 //            for (int i = 0; i < 12; i++) {
                 List<FlatAvito> flatAvitoList = new ArrayList<>();
                 // Чтобы не терялось соединение с БД
-                LiksDAO.getLinks();
+                System.out.print(LiksDAO.getLinks().size()>3);
+                System.out.print(" ");
 
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
