@@ -36,19 +36,6 @@ public class StatisticsFlatAvitoDAO {
 
     }
 
-    public static void main(String[] args) {
-        try {
-            StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
-            statisticsFlatAvitoDAO.deleteAllData();
-            statisticsFlatAvitoDAO.printAllRows();
-            Statement statement = PostgreConnection.getFlatAvitoConnection().createStatement();
-//            statement.execute("INSERT INTO statistics (dollar, averagepricemeter) values(50,44)");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public  void insert(StatisticsFlatAvito sFA){
         PreparedStatement ps = null;
         try {

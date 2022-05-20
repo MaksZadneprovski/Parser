@@ -40,8 +40,7 @@ public class ParserAvito {
 //            for (int i = 0; i < 12; i++) {
                 List<FlatAvito> flatAvitoList = new ArrayList<>();
                 // Чтобы не терялось соединение с БД
-                System.out.print(LiksDAO.getLinks().size()>3);
-                System.out.print(" ");
+                LiksDAO.getLinks().size();
 
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");

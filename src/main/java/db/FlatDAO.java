@@ -34,17 +34,6 @@ public class FlatDAO {
             }
     }
 
-    public static void main(String[] args) {
-        try {
-            FlatDAO flatDAO = new FlatDAO();
-            flatDAO.deleteAllData();
-            flatDAO.printAllRows();
-//            flatDAO.insertRow(1122,3333333,2342,545,656,4324,33.2,"city","yo","city", new Date(System.currentTimeMillis()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void insert(FlatAvito  fA){
         PreparedStatement ps = null;
         try {
