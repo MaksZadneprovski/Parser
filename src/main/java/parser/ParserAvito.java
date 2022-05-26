@@ -1,5 +1,6 @@
 package parser;
 
+import com.sun.tools.javac.Main;
 import db.FlatDAO;
 import db.LiksDAO;
 import db.StatisticsFlatAvitoDAO;
@@ -14,70 +15,80 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import telegram.BotTG;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class ParserAvito {
+    private static final Logger log = Logger.getLogger(ParserAvito.class.getName());
 
-    public static void parse() throws SQLException, InterruptedException {
+    public static void parse() throws SQLException, InterruptedException, IOException {
+        Handler handler = new FileHandler("C:\\Users\\user\\Desktop\\log.txt");
+        log.addHandler(handler);
+        handler.setFormatter(new SimpleFormatter());
 //        System.setProperty("webdriver.chrome.driver","selenium/chromedriver");
-        System.setProperty("webdriver.chrome.driver","selenium/chromedriver.exe");
-
+        System.setProperty("webdriver.chrome.driver","D:\\Java\\Projects\\Parser\\selenium\\chromedriver.exe");
         StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
-
+        log.info("Start Parser");
+        String city;
         for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
-            WebDriver driver = new ChromeDriver();
-            String city = (String) FlatAvito.link.keySet().toArray()[i0];
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--no-sandbox");
+            options.addArguments("--headless");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--window-size=1920x1080");
+            options.setPageLoadTimeout(Duration.ofMinutes(20));
+
+            log.info("Parsing "+FlatAvito.link.keySet().toArray()[i0]);
+
+            WebDriver driver = new ChromeDriver(options);
+            city = (String) FlatAvito.link.keySet().toArray()[i0];
             driver.get(FlatAvito.link.get(city));
             List<FlatAvito> fullFlatAvitoList = new ArrayList<>();
-            int n = 0;
-            int prevNumberPage = 0;
             int numberPage = 0;
-            for (int i = 0; n < 10; i++) {
-//            for (int i = 0; i < 12; i++) {
+            int maxNumberPage = 100;
+
+
+            while (numberPage < maxNumberPage) {
                 List<FlatAvito> flatAvitoList = new ArrayList<>();
                 // Чтобы не терялось соединение с БД
                 LiksDAO.getLinks().size();
 
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
+                String finalCity = city;
                 elements.forEach(e-> {
                     flatAvitoList.add(new FlatAvito(
                             e.getElementsByAttributeValue("class","iva-item-priceStep-uq2CQ").text(),
                             e.getElementsByAttributeValue("class","iva-item-titleStep-pdebR").text(),
-                            city,
+                            finalCity,
                             e.getElementsByAttributeValue("class","geo-root-zPwRk iva-item-geo-_Owyg").text(),
                             e.select("div.iva-item-titleStep-pdebR > a").attr("href")
                     ));
                 });
                 try {
-                    WebElement webElement2 = driver.findElement(By.className("pagination-item_active-NcJX6"));
-                    System.out.print(webElement2.getText()+" ");
-                    numberPage = Integer.parseInt(webElement2.getText());
-                    if (prevNumberPage == numberPage ) n++;
-                    else {
-                        n = 0;
-                        prevNumberPage = numberPage;
-                    }
-                    WebElement webElement = driver.findElement(By.xpath("//*[@id=\"app\"]/div[3]/div[3]/div[3]/div[6]/div[1]/span[11]"));
+                    WebElement webNumberPage = driver.findElement(By.className("pagination-item_active-NcJX6"));
+                    List<WebElement> webElementsList = driver.findElements(By.className("pagination-item-JJq_j"));
+                    maxNumberPage = Integer.parseInt(webElementsList.get(webElementsList.size()-2).getText());
+                    numberPage = Integer.parseInt(webNumberPage.getText());
+
+                    WebElement webElement = webElementsList.get(webElementsList.size()-1);
                     webElement.click();
                 }catch (Exception e){
-                    try {
-                        WebElement webElement = driver.findElement(By.xpath("//*[@id=\"app\"]/div[3]/div[3]/div[3]/div[6]/div[1]/span[9]"));
-                        webElement.click();
-                    }catch (Exception ex) {
-                        System.out.println("continue");
-                        n++;
-                        continue;
-                    }
+                    e.printStackTrace();
                 }
                 fullFlatAvitoList.addAll(flatAvitoList);
-                Thread.sleep(5000);
+                log.info("Finished "+(i0+1)+" из "+ FlatAvito.link.size() +" "+city.toUpperCase()+" page №" + numberPage);
+                Thread.sleep(4000);
             }
-            if (numberPage>10) {
+
                 try {
                     FlatDAO flatDb = new FlatDAO();
                     fullFlatAvitoList = fullFlatAvitoList.stream().distinct().collect(Collectors.toList());
@@ -107,7 +118,7 @@ public class ParserAvito {
                     PostgreConnection.getFlatAvitoConnection().rollback();
                     e.printStackTrace();
                 }
-            }
+            BotTG.botTG.sendMessage(city+" - read "+numberPage+" pages");
             driver.quit();
         }
         PostgreConnection.getFlatAvitoConnection().close();
