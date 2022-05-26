@@ -23,13 +23,14 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class ParserAvito {
     private static final Logger log = Logger.getLogger(ParserAvito.class.getName());
 
-    public static void parse() throws SQLException, InterruptedException, IOException {
+    public static void parse() throws SQLException, IOException {
         Handler handler = new FileHandler("C:\\Users\\user\\Desktop\\log.txt");
         log.addHandler(handler);
         handler.setFormatter(new SimpleFormatter());
@@ -38,6 +39,7 @@ public class ParserAvito {
         StatisticsFlatAvitoDAO statisticsFlatAvitoDAO = new StatisticsFlatAvitoDAO();
         log.info("Start Parser");
         String city;
+
         for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--no-sandbox");
@@ -63,16 +65,18 @@ public class ParserAvito {
 
                 Document document = Jsoup.parse(driver.getPageSource());
                 Elements elements = document.getElementsByClass( "iva-item-body-KLUuy");
+
+                try {TimeUnit.SECONDS.sleep(4);}
+                catch (InterruptedException e) {e.printStackTrace();}
+
                 String finalCity = city;
-                elements.forEach(e-> {
-                    flatAvitoList.add(new FlatAvito(
-                            e.getElementsByAttributeValue("class","iva-item-priceStep-uq2CQ").text(),
-                            e.getElementsByAttributeValue("class","iva-item-titleStep-pdebR").text(),
-                            finalCity,
-                            e.getElementsByAttributeValue("class","geo-root-zPwRk iva-item-geo-_Owyg").text(),
-                            e.select("div.iva-item-titleStep-pdebR > a").attr("href")
-                    ));
-                });
+                elements.forEach(e-> flatAvitoList.add(new FlatAvito(
+                        e.getElementsByAttributeValue("class","iva-item-priceStep-uq2CQ").text(),
+                        e.getElementsByAttributeValue("class","iva-item-titleStep-pdebR").text(),
+                        finalCity,
+                        e.getElementsByAttributeValue("class","geo-root-zPwRk iva-item-geo-_Owyg").text(),
+                        e.select("div.iva-item-titleStep-pdebR > a").attr("href")
+                )));
                 try {
                     WebElement webNumberPage = driver.findElement(By.className("pagination-item_active-NcJX6"));
                     List<WebElement> webElementsList = driver.findElements(By.className("pagination-item-JJq_j"));
@@ -86,7 +90,7 @@ public class ParserAvito {
                 }
                 fullFlatAvitoList.addAll(flatAvitoList);
                 log.info("Finished "+(i0+1)+" из "+ FlatAvito.link.size() +" "+city.toUpperCase()+" page №" + numberPage);
-                Thread.sleep(4000);
+
             }
 
                 try {
