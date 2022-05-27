@@ -11,15 +11,19 @@ import java.util.stream.Collectors;
 
 @Data
 public class FlatAvito {
-    public   static Map<String, String> link;
+    private    static Map<String, String> link;
 
-    static {
+    public static Map<String, String> getLinks(){
+        if (!link.isEmpty()) return link;
         try {
             link = LiksDAO.getLinks();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        if (!link.isEmpty()) return link;
+        return getLinks();
     }
+
 
     private long price;
     private int priceDollar;

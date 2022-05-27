@@ -51,7 +51,7 @@ public class StatisticsFlatAvito {
 
         final TimeSeriesCollection dataset = new TimeSeriesCollection( );
 
-        for (String s:FlatAvito.link.keySet()) {
+        for (String s:FlatAvito.getLinks().keySet()) {
             List<StatisticsFlatAvito> sFAlist  = list.stream().filter(sFA -> sFA.getCity().equals(s)).collect(Collectors.toList());
             TimeSeries series = new TimeSeries(s);
             for (StatisticsFlatAvito f : sFAlist) {

@@ -40,7 +40,7 @@ public class ParserAvito {
         log.info("Start Parser");
         String city;
 
-        for (int i0 = 0; i0 < FlatAvito.link.size(); i0++) {
+        for (int i0 = 0; i0 < FlatAvito.getLinks().size(); i0++) {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--no-sandbox");
             options.addArguments("--headless");
@@ -48,11 +48,11 @@ public class ParserAvito {
             options.addArguments("--window-size=1920x1080");
             options.setPageLoadTimeout(Duration.ofMinutes(20));
 
-            log.info("Parsing "+FlatAvito.link.keySet().toArray()[i0]);
+            log.info("Parsing "+FlatAvito.getLinks().keySet().toArray()[i0]);
 
             WebDriver driver = new ChromeDriver(options);
-            city = (String) FlatAvito.link.keySet().toArray()[i0];
-            driver.get(FlatAvito.link.get(city));
+            city = (String) FlatAvito.getLinks().keySet().toArray()[i0];
+            driver.get(FlatAvito.getLinks().get(city));
             List<FlatAvito> fullFlatAvitoList = new ArrayList<>();
             int numberPage = 0;
             int maxNumberPage = 100;
@@ -89,7 +89,7 @@ public class ParserAvito {
                     e.printStackTrace();
                 }
                 fullFlatAvitoList.addAll(flatAvitoList);
-                log.info("Finished "+(i0+1)+" из "+ FlatAvito.link.size() +" "+city.toUpperCase()+" page №" + numberPage);
+                log.info("Finished "+(i0+1)+" из "+ FlatAvito.getLinks().size() +" "+city.toUpperCase()+" page №" + numberPage);
 
             }
 
