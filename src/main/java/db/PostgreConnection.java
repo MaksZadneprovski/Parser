@@ -17,9 +17,7 @@ public class PostgreConnection {
                 String login = "root";
                 String password = "root";
                 DbConnection = DriverManager.getConnection(url, login, password);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
         }

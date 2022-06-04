@@ -8,14 +8,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LiksDAO {
-    public static Map<String, String> getLinks() throws SQLException {
+    public static Map<String, String> getLinks(){
         Map<String, String> links = new HashMap<>();
-        Statement statement = PostgreConnection.getFlatAvitoConnection().createStatement();
-        ResultSet rs = statement.executeQuery("SELECT * FROM links;");
-        while (rs.next()) {
-            String key = rs.getString(1);
-            String value = rs.getString(2);
-            links.put(key,value);
+        try {
+            Statement  statement = PostgreConnection.getFlatAvitoConnection().createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM links;");
+            while (rs.next()) {
+                String key = rs.getString(1);
+                String value = rs.getString(2);
+                links.put(key,value);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return links;
     }

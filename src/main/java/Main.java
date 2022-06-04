@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.logging.*;
 
 public class Main  {
-    private static Logger log = Logger.getLogger(Main.class.getName());
+    private static final Logger log = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) throws IOException {
         BotTG.botTG.botConnect();
@@ -26,4 +26,7 @@ public class Main  {
             log.log(Level.WARNING,"Error",e);
         }
     }
+//    public static void main(String[] args) throws IOException {
+//
+//    }
 }

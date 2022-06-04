@@ -3,7 +3,7 @@ package model;
 import db.LiksDAO;
 import lombok.Data;
 
-import java.sql.SQLException;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,12 +14,8 @@ public class FlatAvito {
     private    static Map<String, String> link;
 
     public static Map<String, String> getLinks(){
-        if (!link.isEmpty()) return link;
-        try {
-            link = LiksDAO.getLinks();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        if (link != null) return link;
+        link = LiksDAO.getLinks();
         if (!link.isEmpty()) return link;
         return getLinks();
     }
@@ -45,15 +41,15 @@ public class FlatAvito {
         parseTitleString(titleString);
         this.dollar = Constans.dollar;
         this.priceDollar = (int) (this.price/this.dollar);
-        calculateEmptyFields();
+        calculatePricePerMeter();
         this.city = city;
         this.date = System.currentTimeMillis();
     }
 
-    public void calculateEmptyFields(){
+    public void calculatePricePerMeter(){
         if (this.getPricePerMeter() == -1){
-            if (this.getPriceDollar() != -1 && this.getSquare() != -1) {
-                this.setPricePerMeter((int) (this.getPriceDollar() / this.getSquare()));
+            if (this.getPrice() != -1 && this.getSquare() != -1) {
+                this.setPricePerMeter((int) (this.getPrice() / this.getSquare()));
             }
         }
     }
@@ -62,12 +58,11 @@ public class FlatAvito {
         try {
             s = s.replaceAll("\\s","");
             Pattern pattern = Pattern.compile("\\d+₽");
-            /////////////////////////////////
             Matcher matcher = pattern.matcher(s);
             this.price = Long.parseLong(cutToPattern(s,matcher));
             this.pricePerMeter = Integer.parseInt(cutToPattern(s,matcher));
         }catch (Exception e){
-            System.out.println(s);
+            e.printStackTrace();
         }
 
     }
@@ -85,7 +80,7 @@ public class FlatAvito {
             if (s.equals("price")){
                 d+=f.getPrice();
             }
-            if (s.equals("pricePerMetr")){
+            if (s.equals("pricePerMeter")){
                 d+=f.getPricePerMeter();
             }
             i++;

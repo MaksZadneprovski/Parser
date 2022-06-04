@@ -103,8 +103,8 @@ public class ParserAvito {
 
                     statisticsFlatAvitoDAO.insert(new StatisticsFlatAvito(
                             Constans.dollar,
-                            FlatAvito.calculateAverage(fullFlatAvitoList, "pricePerMetr",0),
-                            FlatAvito.calculateMedian(fullFlatAvitoList, "pricePerMetr",0),
+                            FlatAvito.calculateAverage(fullFlatAvitoList, "pricePerMeter",0),
+                            FlatAvito.calculateMedian(fullFlatAvitoList, "pricePerMeter",0),
                             FlatAvito.calculateAverage(fullFlatAvitoList, "price",0),
                             FlatAvito.calculateMedian(fullFlatAvitoList, "price",0),
                             FlatAvito.calculateAverage(fullFlatAvitoList, "price",1),
